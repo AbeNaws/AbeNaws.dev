@@ -1,4 +1,4 @@
 Test for the flipper
 web browser. Coming
-soonin Beta.
+soon in Beta.
 ######################
