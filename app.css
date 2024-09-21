@@ -6,14 +6,14 @@
 }
 
 .main h1 {
-    top: 50%;
-    left: 50%;
-    position: absolute;
-    transform: translate(-50%, -100%);
-    font-size: 50px;
-    color: #F3F2F3;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -100%);
+  font-size: 50px;
+  color: #F3F2F3;
 }
- 
+
 .main a {
   text-decoration: none;
   position: relative;
@@ -25,22 +25,22 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;  
+  bottom: 0;
   height: 2px;
   background: #ffffff;
   transform-origin: right top;
-  transform: scale(0, 1); 
+  transform: scale(0, 1);
   transition: transform .2s ease-out;
 }
 
 .main a:hover:after {
   transform-origin: left top;
-  transform: scale(1, 1); 
+  transform: scale(1, 1);
 }
 
 a {
-    color: #F3F2F3;
-    text-decoration: none;
+  color: #F3F2F3;
+  text-decoration: none;
 }
 
 a:active {
@@ -54,44 +54,48 @@ a:visited {
 }
 
 .text {
-    z-index: 2;
-    animation: textPulse 5s infinite;  
+  z-index: 2;
+  animation: textPulse 5s infinite;
+}
+
+@keyframes textPulse {
+  0% {
+    color: #F3F2F3;
   }
 
-  @keyframes textPulse {
-    0% {
-      color: #F3F2F3;
-    }
-    50% {
-      color: rgb(255, 255, 255)2F3;
-    }
-    100% {
-      color: #F3F2F3;
-    }  
+  50% {
+    color: rgb(255, 255, 255)2F3;
   }
+
+  100% {
+    color: #F3F2F3;
+  }
+}
 
 .ghost {
-    position: absolute;
-    opacity: 40%;
-    filter: blur(3px);
-    z-index: 1;
-  }
+  position: absolute;
+  opacity: 40%;
+  filter: blur(3px);
+  z-index: 1;
+}
 
 body {
-    animation: pulse 10s infinite;
+  animation: pulse 10s infinite;
 }
-  
+
 @keyframes pulse {
-    0% {
-      background-color: #1D2556; 
-    }
-    50% {
-      background-color: #141a3d;
-    }
-    100% {
-      background-color: #1D2556;
-    }
-  } 
+  0% {
+    background-color: #1D2556;
+  }
+
+  50% {
+    background-color: #141a3d;
+  }
+
+  100% {
+    background-color: #1D2556;
+  }
+}
 
 .headlink {
   color: #F3F2F3;
@@ -114,7 +118,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;  
+  bottom: 0;
   height: 2px;
   background: #F3F2F3;
   transform-origin: center bottom;
@@ -166,7 +170,8 @@ a:hover:after {
 }
 
 .projects img {
-  height: auto; /* This will maintain the aspect ratio of the images */
+  height: auto;
+  /* This will maintain the aspect ratio of the images */
 }
 
 .projects div {

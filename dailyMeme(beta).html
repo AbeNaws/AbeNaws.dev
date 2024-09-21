@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Meme</title>
+    <link rel="stylesheet" href="app.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        /* Meme-specific styles */
+        #meme-container {
+            text-align: center;
+            max-width: 90%;
+        }
+
+        #meme-container img {
+            max-width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #meme-container h2 {
+            color: #F3F2F3;
+            font-size: 24px;
+        }
+
+        .mememain {
+            height: auto;
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .mememain h1 {
+            font-size: 50px;
+            color: #F3F2F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="headdiv">
+        <a class="headlink" href="https://search.abenaws.dev">Search Engine</a>
+        <a class="headlink" href="https://github.com/abenaws">Github</a>
+        <a class="headlink" href="mailto:AbeNaws@abenaws.dev">Contact</a>
+        <a class="headlink" href="https://github.com/AbeNaws/AbeNaws.dev">Source Code</a>
+    </div>
+    <div class="mememain">
+        <h1>Daily Meme</h1>
+        <div id="meme-container">Loading...</div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+        function getDateString() {
+            const now = new Date();
+            return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+        }
+
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+
+        function getCachedMemes() {
+            const cachedData = localStorage.getItem('cachedMemes');
+            if (cachedData) {
+                return JSON.parse(cachedData);
+            }
+            return null;
+        }
+
+        function setCachedMemes(memes) {
+            localStorage.setItem('cachedMemes', JSON.stringify({
+                date: getDateString(),
+                memes: memes
+            }));
+        }
+
+        function fetchMemes() {
+            return axios.get('https://www.reddit.com/r/cleanmemes/hot.json?limit=100')
+                .then(response => {
+                    const posts = response.data.data.children;
+                    const imagePosts = posts.filter(post => {
+                        const url = post.data.url;
+                        return url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.gif');
+                    });
+                    return imagePosts.map(post => ({
+                        title: post.data.title,
+                        url: post.data.url
+                    }));
+                });
+        }
+
+        function loadDailyMeme() {
+            const memeContainer = document.getElementById('meme-container');
+            const currentDate = getDateString();
+
+            const cachedData = getCachedMemes();
+
+            if (cachedData && cachedData.date === currentDate) {
+                displayMeme(cachedData.memes, currentDate);
+            } else {
+                fetchMemes()
+                    .then(memes => {
+                        setCachedMemes(memes);
+                        displayMeme(memes, currentDate);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        memeContainer.innerHTML = 'Error loading meme. Please try again later.';
+                    });
+            }
+        }
+
+        function displayMeme(memes, currentDate) {
+            const memeContainer = document.getElementById('meme-container');
+
+            if (memes.length === 0) {
+                memeContainer.innerHTML = 'No memes available. Please try again later.';
+                return;
+            }
+
+            const seed = currentDate.split('-').reduce((acc, val) => acc + parseInt(val), 0);
+            const randomValue = seededRandom(seed);
+            const selectedIndex = Math.floor(randomValue * memes.length);
+            const selectedMeme = memes[selectedIndex];
+
+            memeContainer.innerHTML = `
+                <h2>${selectedMeme.title}</h2>
+                <img src="${selectedMeme.url}" alt="Daily Meme">
+            `;
+        }
+
+        // Load the daily meme when the page loads
+        loadDailyMeme();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,145 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 80%;
+}
+
+img {
+    max-width: 100%;
+    max-height: 70vh;
+    margin-top: 20px;
+}
+
+#date {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: #1D2556;
+    }
+
+    50% {
+        background-color: #141a3d;
+    }
+
+    100% {
+        background-color: #1D2556;
+    }
+}
+
+body {
+    animation: pulse 10s infinite;
+}
+
+.main a {
+    text-decoration: none;
+    position: relative;
+    color: white;
+}
+
+.main a:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: #ffffff;
+    transform-origin: right top;
+    transform: scale(0, 1);
+    transition: transform .2s ease-out;
+}
+
+.main a:hover:after {
+    transform-origin: left top;
+    transform: scale(1, 1);
+}
+
+a {
+    color: #F3F2F3;
+    text-decoration: none;
+}
+
+a:active {
+    color: #F3F2F3;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #F3F2F3;
+    text-decoration: none;
+}
+
+.headlink {
+    color: #F3F2F3;
+    text-decoration: none;
+    position: relative;
+}
+
+.headlink:active {
+    color: #F3F2F3;
+    text-decoration: underline;
+}
+
+.headlink:visited {
+    color: #F3F2F3;
+    text-decoration: underline;
+}
+
+.headlink:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: #F3F2F3;
+    transform-origin: center bottom;
+    transform: scale(0, 1);
+    transition: transform .3s ease-out;
+}
+
+a:hover:after {
+    transform-origin: center bottom;
+    transform: scale(1, 1);
+}
+
+.headdiv {
+    padding: 10px;
+    display: flex;
+    gap: 20px;
+}
+
+/* WebKit (Chrome, Safari, and Opera) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #00000044;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Style scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #ffffff57;
+}
