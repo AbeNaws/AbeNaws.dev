@@ -38,6 +38,13 @@
   transform: scale(1, 1);
 }
 
+.logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 a {
   color: #F3F2F3;
   text-decoration: none;
@@ -64,7 +71,7 @@ a:visited {
   }
 
   50% {
-    color: rgb(255, 255, 255)2F3;
+    color: #ffffff;
   }
 
   100% {
@@ -77,6 +84,9 @@ a:visited {
   opacity: 40%;
   filter: blur(3px);
   z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 body {
@@ -89,7 +99,7 @@ body {
   }
 
   50% {
-    background-color: #141a3d;
+    background-color: #0e132c;
   }
 
   100% {
@@ -152,11 +162,11 @@ a:hover:after {
   transition: 0.3s;
 }
 
-/* Style scrollbar thumb on hover */
+/* Style scrollbar thumb on hover, color smooth transition */
 ::-webkit-scrollbar-thumb:hover {
   background-color: #ffffff57;
+  transition: 1s;
 }
-
 
 .projects {
   display: flex;

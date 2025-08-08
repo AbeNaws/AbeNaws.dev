@@ -17,9 +17,7 @@ function handleMouseMove(e) {
   const distX = (x - centerX) / 40; 
   const distY = (y - centerY) / 40;
 
-  // Set position using distance 
-  // from center scaled down
-  ghost.style.left = centerX + distX + 'px';
-  ghost.style.top = centerY + distY + 'px';
+  // Set transform for parallax effect
+  ghost.style.transform = `translate(calc(-50% + ${distX}px), calc(-50% + ${distY}px))`;
 
 }
