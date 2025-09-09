@@ -1,14 +1,13 @@
-from pathlib import Path
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>1‑bit Image Converter</title>
+<title>1-bit Image Converter</title>
 <style>
   :root{
     --bg:#0b1220; --card:#121a2a; --ink:#d6e1ff; --muted:#93a0c6; --accent:#5aa2ff; --warn:#ff6b6b;
+    --touch:14px; /* extra padding for touch */
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
@@ -24,7 +23,7 @@ from pathlib import Path
   main{display:grid;grid-template-columns:280px 1fr;gap:12px;padding:12px;height:calc(100% - 57px)}
   .panel{background:var(--card);border:1px solid #1f2a44;border-radius:14px;padding:12px;overflow:hidden}
   #left{display:flex;flex-direction:column;min-width:0}
-  #drop{border:1px dashed #2a3b64;border-radius:12px;padding:14px;text-align:center;color:#93a0c6;cursor:pointer;user-select:none}
+  #drop{border:1px dashed #2a3b64;border-radius:12px;padding:14px;text-align:center;color:var(--muted);cursor:pointer;user-select:none}
   #drop.hover{background:#0f1830}
   #fileInput{display:none}
   .thumbs{margin-top:12px;overflow:auto;flex:1;display:grid;gap:8px;grid-template-columns:1fr;padding-right:4px}
@@ -46,7 +45,7 @@ from pathlib import Path
   #canvasWrap{position:relative;flex:1;min-height:360px;background:#0a1020;border:1px solid #1f2a44;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
   #preview{width:100%;height:100%;display:block;touch-action:none}
   footer{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .note{color:#93a0c6;font-size:12px}
+  .note{color:var(--muted);font-size:12px}
 
   /* Drawer for mobile */
   .drawer-mask{position:fixed;inset:0;background:rgba(5,10,20,.5);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
@@ -57,10 +56,11 @@ from pathlib import Path
   body[data-drawer="open"] .drawer{transform:translateX(0)}
   body[data-drawer="open"] .drawer-mask{opacity:1;pointer-events:auto}
 
+  /* Responsive: stack panels and use drawer */
   @media (max-width: 900px){
     header .hint{display:none}
     main{grid-template-columns:1fr;height:auto}
-    #left{display:none}
+    #left{display:none} /* replaced by drawer */
     #right{min-height:calc(100vh - 57px);}
     .controls{gap:10px}
     .seg button,.btn{padding:12px 14px}
@@ -78,6 +78,7 @@ from pathlib import Path
 <div id="banner" class="banner"></div>
 
 <main>
+  <!-- Left panel kept for desktop; same content also appears inside drawer for mobile -->
   <section id="left" class="panel">
     <div id="drop">
       <strong>Drop images here</strong> or tap to select<br>
@@ -124,6 +125,7 @@ from pathlib import Path
   </section>
 </main>
 
+<!-- Drawer (mobile) -->
 <div class="drawer-mask" id="drawerMask"></div>
 <aside class="drawer" role="dialog" aria-modal="true" aria-label="Images drawer" id="drawer">
   <header>
@@ -154,6 +156,7 @@ from pathlib import Path
     __warnTimer = setTimeout(()=>{ banner.classList.remove('show'); banner.textContent=''; }, 5000);
   };
 
+  // DOM elements (desktop + mobile drawer mirrors)
   const drop = document.getElementById('drop');
   const fileInput = document.getElementById('fileInput');
   const thumbs = document.getElementById('thumbs');
@@ -181,6 +184,7 @@ from pathlib import Path
   const canvas = document.getElementById('preview');
   const ctx = canvas.getContext('2d', { willReadFrequently:true });
 
+  // Drawer helpers
   function setDrawer(open){
     document.body.setAttribute('data-drawer', open ? 'open' : '');
     openDrawerBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -189,6 +193,7 @@ from pathlib import Path
   closeDrawerBtn.addEventListener('click', ()=> setDrawer(false));
   drawerMask.addEventListener('click', ()=> setDrawer(false));
 
+  // Shared state
   const state = {
     files: [], // {name,url,img,view:{scale,ox,oy,rot}, settings:{orientation,target,dither,gamma,invert}}
     active: -1,
@@ -198,6 +203,7 @@ from pathlib import Path
     invert: false
   };
 
+  // Canvas sizing
   function sizeCanvas() {
     const r = canvas.parentElement.getBoundingClientRect();
     const w = Math.max(200, Math.floor(r.width));
@@ -209,6 +215,7 @@ from pathlib import Path
   window.addEventListener('resize', sizeCanvas, { passive:true });
   setTimeout(sizeCanvas, 0);
 
+  // Utilities
   const exOK = (name)=>/\\.(jpe?g|png|webp|gif|bmp)$/i.test(name||'');
   const countUpdate = ()=> imgCount.textContent = '(' + state.files.length + ')';
 
@@ -268,7 +275,9 @@ from pathlib import Path
   }
 
   function renderThumbs() {
+    // Desktop
     thumbs.innerHTML = '';
+    // Mobile
     thumbsMobile.innerHTML = '';
 
     state.files.forEach((f,i)=>{
@@ -284,7 +293,7 @@ from pathlib import Path
         del.addEventListener('click', (ev)=>{ ev.stopPropagation(); removeAt(i); });
 
         el.appendChild(im); el.appendChild(nm); el.appendChild(del);
-        el.addEventListener('click', ()=>{ setActive(i); });
+        el.addEventListener('click', ()=>{ setActive(i); /* keep drawer open */ });
         return el;
       };
       thumbs.appendChild(makeCard());
@@ -340,6 +349,7 @@ from pathlib import Path
     setActive(newActive);
   }
 
+  // Preview + processing
   function drawChecker(x=0,y=0,w=canvas.width,h=canvas.height){
     const s=12;
     for(let yy=y|0; yy<y+h; yy+=s){
@@ -349,24 +359,17 @@ from pathlib import Path
       }
     }
   }
-
-  // Uniform-scale draw: translate -> rotate -> scale -> drawImage(natural)
   function rasterizeActiveRGBA(w,h){
     if(state.active<0){ return null; }
     const item=state.files[state.active], v=item.view, iw=item.img.naturalWidth, ih=item.img.naturalHeight;
-    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-    const c=cv.getContext('2d',{willReadFrequently:true});
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const c=cv.getContext('2d',{willReadFrequently:true});
     c.fillStyle='#fff'; c.fillRect(0,0,w,h);
-    c.save();
-    c.beginPath(); c.rect(0,0,w,h); c.clip();
-    c.translate(v.ox, v.oy);
-    c.rotate(v.rot*Math.PI/180);
-    c.scale(v.scale, v.scale);
-    c.drawImage(item.img, -iw/2, -ih/2);
-    c.restore();
+    c.translate(w/2,h/2); c.beginPath(); c.rect(-w/2,-h/2,w,h); c.clip();
+    c.translate(v.ox - w/2, v.oy - h/2); c.translate(w/2,h/2); c.rotate(v.rot*Math.PI/180);
+    const drawW=(v.rot%180===0)? iw*v.scale : ih*v.scale; const drawH=(v.rot%180===0)? ih*v.scale : iw*v.scale;
+    c.drawImage(item.img, -drawW/2,-drawH/2,drawW,drawH);
     return c.getImageData(0,0,w,h);
   }
-
   function toGray(img, gamma){
     const d=img.data, n=d.length/4, out=new Float32Array(n), gpow=1/gamma;
     for(let i=0,j=0;i<d.length;i+=4,j++){ let y=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; y=255*Math.pow(y/255,gpow); out[j]=y; }
@@ -417,7 +420,7 @@ from pathlib import Path
     ctx.restore();
   }
 
-  // Desktop pan/zoom
+  // Mouse drag + wheel (desktop)
   let dragging=false, lastX=0, lastY=0;
   canvas.addEventListener('mousedown', (e)=>{ if(state.active<0)return; dragging=true; lastX=e.clientX; lastY=e.clientY; });
   window.addEventListener('mouseup', ()=> dragging=false);
@@ -436,7 +439,7 @@ from pathlib import Path
     v.scale *= (1 - delta); ensureMinCover(v, state.files[state.active].img, tw, th); drawPreview();
   }, { passive:false });
 
-  // Touch pan + pinch zoom
+  // Touch: drag to pan, pinch to zoom
   let touchMode = { type:null, lastX:0, lastY:0, startDist:0, startScale:1 };
   function getTouchDist(e){
     const t0=e.touches[0], t1=e.touches[1];
@@ -474,7 +477,7 @@ from pathlib import Path
   }, { passive:false });
   canvas.addEventListener('touchend', ()=>{ touchMode.type=null; }, { passive:true });
 
-  // Controls
+  // Controls (per-image)
   function setOrientation(portrait=true){
     const item = state.files[state.active]; if (!item) return;
     portraitBtn.classList.toggle('active', portrait);
@@ -528,7 +531,7 @@ from pathlib import Path
     drawPreview();
   }
 
-  // Save / ZIP
+  // Save / ZIP (per-image settings)
   function pack1bpp(bin,w,h){ const rb=Math.ceil(w/8), pr=((rb+3)&~3), out=new Uint8Array(pr*h);
     for(let y=0;y<h;y++){const s=h-1-y; let byte=0,bit=7,idx=y*pr;
       for(let x=0;x<w;x++){ byte |= (bin[s*w+x]&1)<<bit; if(--bit<0){ out[idx++]=byte; byte=0; bit=7; } }
@@ -613,6 +616,7 @@ from pathlib import Path
     saveBlob(zip, `t5_bmps.zip`);
   });
 
+  // Drag/drop & pickers (desktop + mobile)
   function wireDrop(zone, input){
     zone.addEventListener('click', ()=> input.click());
     zone.addEventListener('dragover', (e)=>{ e.preventDefault(); zone.classList.add('hover'); });
@@ -624,6 +628,7 @@ from pathlib import Path
   fileInput.addEventListener('change', (e)=> addFiles(e.target.files));
   fileInputMobile.addEventListener('change', (e)=> addFiles(e.target.files));
 
+  // Keyboard helpers
   window.addEventListener('keydown',(e)=>{
     if (e.key==='ArrowLeft') setActive(Math.max(0,state.active-1));
     if (e.key==='ArrowRight') setActive(Math.min(state.files.length-1,state.active+1));
@@ -636,6 +641,7 @@ from pathlib import Path
     }
   });
 
+  // Init
   applySettingsToControlsAndState({
     orientation:'portrait', target:{w:176,h:264}, dither:'none', gamma:1.0, invert:false
   });
